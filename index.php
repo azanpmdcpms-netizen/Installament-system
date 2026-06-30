@@ -9,14 +9,14 @@ if (isset($_SESSION['user_id'])) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if ($username === '' || $password === '') {
-        $error = 'Please enter both username and password.';
+    if ($email === '' || $password === '') {
+        $error = 'Please enter both email and password.';
     } else {
-        $stmt = $pdo->prepare('SELECT id, full_name, username, password_hash FROM users WHERE username = ?');
-        $stmt->execute([$username]);
+        $stmt = $pdo->prepare('SELECT id, full_name, username, password_hash FROM users WHERE email = ?');
+        $stmt->execute([$email]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        $error = 'Invalid username or password.';
+        $error = 'Invalid email or password.';
     }
 }
 ?>
@@ -50,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="post">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required>
+<label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
 
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required>

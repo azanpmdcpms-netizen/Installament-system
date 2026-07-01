@@ -27,6 +27,8 @@ if (!isset($_SESSION['user_id'])) {
         <div class="actions">
             <a href="customers.php" class="button-link">Manage Customers</a>
             <a href="products.php" class="button-link">Manage Products</a>
+            <a href="installments.php" class="button-link">Manage Installments</a>
+            <a href="payments.php" class="button-link">Manage Payments</a>
             <a href="logout.php" class="button-link">Logout</a>
         </div>
     </div>

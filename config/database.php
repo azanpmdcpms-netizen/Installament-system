@@ -66,6 +66,55 @@ function initializeDatabase(string $host, string $dbName, string $username, stri
         ) ENGINE=InnoDB"
     );
 
+    $dbPdo->exec(
+        "CREATE TABLE IF NOT EXISTS installments (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            customer_id INT NOT NULL,
+            product_id INT NOT NULL,
+            total_price DECIMAL(10,2) NOT NULL,
+            down_payment DECIMAL(10,2) NOT NULL,
+            monthly_installment DECIMAL(10,2) NOT NULL,
+            months INT NOT NULL,
+            remaining_amount DECIMAL(10,2) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
+            FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB"
+    );
+
+    $dbPdo->exec(
+        "CREATE TABLE IF NOT EXISTS payments (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            installment_id INT NOT NULL,
+            amount DECIMAL(10,2) NOT NULL,
+            payment_date DATE NOT NULL,
+            status VARCHAR(20) NOT NULL DEFAULT 'Paid',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (installment_id) REFERENCES installments(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB"
+    );
+
+    $paymentColumns = [];
+    foreach ($dbPdo->query('SHOW COLUMNS FROM payments') as $column) {
+        $paymentColumns[$column['Field']] = true;
+    }
+
+    if (!isset($paymentColumns['amount'])) {
+        $dbPdo->exec('ALTER TABLE payments ADD COLUMN amount DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER installment_id');
+    }
+
+    if (!isset($paymentColumns['payment_date'])) {
+        $dbPdo->exec('ALTER TABLE payments ADD COLUMN payment_date DATE NOT NULL DEFAULT CURRENT_DATE AFTER amount');
+    }
+
+    if (!isset($paymentColumns['status'])) {
+        $dbPdo->exec('ALTER TABLE payments ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT "Paid" AFTER payment_date');
+    }
+
+    if (!isset($paymentColumns['created_at'])) {
+        $dbPdo->exec('ALTER TABLE payments ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER status');
+    }
+
     $checkStmt = $dbPdo->prepare("SELECT id, full_name, email, password_hash FROM users WHERE username = ?");
     $checkStmt->execute(['admin']);
     $adminUser = $checkStmt->fetch();

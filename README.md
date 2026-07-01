@@ -1,6 +1,6 @@
 # Installment Management System
 
-A simple PHP login-based installment management system for Day 1 setup.
+A simple PHP login-based installment management system for initial setup.
 
 ## Features
 - Login page
@@ -8,7 +8,7 @@ A simple PHP login-based installment management system for Day 1 setup.
 - Logout
 - MySQL database auto-creation on first run
 
-## Default Login
+## Demo Login
 - Username: admin
 - Password: admin123
 

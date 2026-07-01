@@ -56,8 +56,9 @@ $products = $pdo->query('SELECT id, name FROM products ORDER BY name')->fetchAll
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="card card-wide">
-        <h1>Installment Module</h1>
+    <div class="page-shell">
+        <div class="card card-wide">
+            <h1>Installment Module</h1>
         <p class="subtitle">Create and review installment plans.</p>
 
         <?php if ($message !== ''): ?>

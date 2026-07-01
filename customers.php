@@ -64,8 +64,9 @@ $customers = $stmt->fetchAll();
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="card card-wide">
-        <h1>Customer Module</h1>
+    <div class="page-shell">
+        <div class="card card-wide">
+            <h1>Customer Module</h1>
         <p class="subtitle">Add, view, edit, and delete customers.</p>
 
         <?php if ($message !== ''): ?>

@@ -37,29 +37,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Installment System</title>
+    <title>Installment Management System — Login</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="card">
-        <h1>Installment Management System</h1>
-        <p class="subtitle">Day 1 - Login</p>
+    <div class="page-shell">
+        <div class="card">
+            <h1>Installment Management System</h1>
+            <p class="subtitle">Sign in to your account</p>
 
-        <?php if ($error !== ''): ?>
-            <div class="alert"><?php echo htmlspecialchars($error); ?></div>
-        <?php endif; ?>
+            <?php if ($error !== ''): ?>
+                <div class="alert"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
 
-        <form method="post">
-<label for="email">Email</label>
-        <input type="email" id="email" name="email" required>
+            <form method="post">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
 
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
 
             <button type="submit">Login</button>
         </form>
 
-        <p class="hint">Default login: admin / admin123</p>
+            <p class="hint">Demo credentials: admin / admin123</p>
+        </div>
     </div>
 </body>
 </html>

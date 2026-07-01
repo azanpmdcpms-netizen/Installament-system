@@ -55,8 +55,9 @@ $installments = $pdo->query('SELECT i.id, c.name AS customer_name, pr.name AS pr
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="card card-wide">
-        <h1>Payment Module</h1>
+    <div class="page-shell">
+        <div class="card card-wide">
+            <h1>Payment Module</h1>
         <p class="subtitle">Add payments and review payment history.</p>
 
         <?php if ($message !== ''): ?>

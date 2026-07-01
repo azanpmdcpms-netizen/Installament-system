@@ -56,6 +56,16 @@ function initializeDatabase(string $host, string $dbName, string $username, stri
         ) ENGINE=InnoDB"
     );
 
+    $dbPdo->exec(
+        "CREATE TABLE IF NOT EXISTS products (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            price DECIMAL(10,2) NOT NULL,
+            description TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB"
+    );
+
     $checkStmt = $dbPdo->prepare("SELECT id, full_name, email, password_hash FROM users WHERE username = ?");
     $checkStmt->execute(['admin']);
     $adminUser = $checkStmt->fetch();
@@ -67,14 +77,14 @@ function initializeDatabase(string $host, string $dbName, string $username, stri
     } else {
         $updateFields = [];
         $params = [];
-
+  
         if (empty($adminUser['full_name'])) {
             $updateFields[] = 'full_name = ?';
             $params[] = 'Admin User';
         }
 
         if (empty($adminUser['email'])) {
-            $updateFields[] = 'email = ?';
+            $updateFields[] = 'email = ?'; 
             $params[] = 'admin@example.com';
         }
 

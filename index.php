@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($email === '' || $password === '') {
         $error = 'Please enter both email and password.';
     } else {
-        $stmt = $pdo->prepare('SELECT id, full_name, username, password_hash FROM users WHERE email = ?');
-        $stmt->execute([$email]);
+        $stmt = $pdo->prepare('SELECT id, full_name, username, password_hash FROM users WHERE email = ? OR username = ?');
+        $stmt->execute([$email, $email]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Login</button>
         </form>
 
-            <p class="hint">Demo credentials: admin / admin123</p>
+            <p class="hint">Demo credentials: admin / admin123 (username or email accepted)</p>
         </div>
     </div>
 </body>

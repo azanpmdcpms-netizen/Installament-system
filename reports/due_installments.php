@@ -20,6 +20,16 @@ $dues = $stmt->fetchAll();
 <body>
     <div class="page-shell">
         <div class="card card-wide">
+            <div class="app-header">
+                <div class="logo">Due Installments</div>
+                <div class="nav-links">
+                    <a href="../dashboard.php">Dashboard</a>
+                    <a href="../customers.php">Customers</a>
+                    <a href="../products.php">Products</a>
+                    <a href="../installments.php">Installments</a>
+                    <a href="../payments.php">Payments</a>
+                </div>
+            </div>
             <h1>Due Installments</h1>
         <p class="subtitle">Installments with outstanding balances.</p>
 

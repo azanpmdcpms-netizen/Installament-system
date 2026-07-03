@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $message = '';
+$search = trim($_GET['search'] ?? '');
 $viewInstallment = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,6 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = 'Please fill in all fields.';
         } elseif (!is_numeric($totalPrice) || (float)$totalPrice < 0 || !is_numeric($downPayment) || (float)$downPayment < 0 || !is_numeric($monthlyInstallment) || (float)$monthlyInstallment < 0 || !is_numeric($months) || (int)$months <= 0) {
             $message = 'Please enter valid installment values.';
+        } elseif ((float)$downPayment > (float)$totalPrice) {
+            $message = 'Down payment cannot exceed the total price.';
         } else {
             $remainingAmount = max(0, (float)$totalPrice - (float)$downPayment);
             $stmt = $pdo->prepare('INSERT INTO installments (customer_id, product_id, total_price, down_payment, monthly_installment, months, remaining_amount) VALUES (?, ?, ?, ?, ?, ?, ?)');
@@ -41,7 +44,16 @@ if (isset($_GET['view_id'])) {
     $viewInstallment = $stmt->fetch();
 }
 
-$stmt = $pdo->query('SELECT i.*, c.name AS customer_name, p.name AS product_name FROM installments i LEFT JOIN customers c ON c.id = i.customer_id LEFT JOIN products p ON p.id = i.product_id ORDER BY i.id DESC');
+$whereClause = '';
+$params = [];
+if ($search !== '') {
+    $whereClause = 'WHERE c.name LIKE ? OR p.name LIKE ? OR i.id LIKE ?';
+    $term = '%' . $search . '%';
+    $params = [$term, $term, $term];
+}
+
+$stmt = $pdo->prepare('SELECT i.*, c.name AS customer_name, p.name AS product_name FROM installments i LEFT JOIN customers c ON c.id = i.customer_id LEFT JOIN products p ON p.id = i.product_id ' . $whereClause . ' ORDER BY i.id DESC');
+$stmt->execute($params);
 $installments = $stmt->fetchAll();
 
 $customers = $pdo->query('SELECT id, name FROM customers ORDER BY name')->fetchAll();
@@ -58,7 +70,16 @@ $products = $pdo->query('SELECT id, name FROM products ORDER BY name')->fetchAll
 <body>
     <div class="page-shell">
         <div class="card card-wide">
-            <h1>Installment Module</h1>
+        <div class="app-header">
+            <div class="logo">Installment Module</div>
+            <div class="nav-links">
+                <a href="dashboard.php">Dashboard</a>
+                <a href="customers.php">Customers</a>
+                <a href="products.php">Products</a>
+                <a href="payments.php">Payments</a>
+            </div>
+        </div>
+        <h1>Installment Module</h1>
         <p class="subtitle">Create and review installment plans.</p>
 
         <?php if ($message !== ''): ?>
@@ -119,6 +140,14 @@ $products = $pdo->query('SELECT id, name FROM products ORDER BY name')->fetchAll
                 <p><strong>Remaining Amount:</strong> <?php echo number_format((float)$viewInstallment['remaining_amount'], 2); ?></p>
             </div>
         <?php endif; ?>
+
+        <form method="get" class="search-bar">
+            <input type="search" name="search" class="search-input" placeholder="Search installments..." value="<?php echo htmlspecialchars($search); ?>">
+            <button type="submit" class="button-link search-button">Search</button>
+            <?php if ($search !== ''): ?>
+                <a href="installments.php" class="button-link secondary">Clear</a>
+            <?php endif; ?>
+        </form>
 
         <h2 style="margin-top: 30px;">Installment List</h2>
         <?php if (empty($installments)): ?>

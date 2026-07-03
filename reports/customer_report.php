@@ -20,6 +20,16 @@ $customers = $stmt->fetchAll();
 <body>
     <div class="page-shell">
         <div class="card card-wide">
+            <div class="app-header">
+                <div class="logo">Customer Report</div>
+                <div class="nav-links">
+                    <a href="../dashboard.php">Dashboard</a>
+                    <a href="../customers.php">Customers</a>
+                    <a href="../products.php">Products</a>
+                    <a href="../installments.php">Installments</a>
+                    <a href="../payments.php">Payments</a>
+                </div>
+            </div>
             <h1>Customer Report</h1>
         <p class="subtitle">List of customers and their installment summary.</p>
 

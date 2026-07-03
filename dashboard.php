@@ -22,6 +22,16 @@ $totalPayments = (int)$pdo->query('SELECT COUNT(*) FROM payments')->fetchColumn(
 <body>
     <div class="page-shell">
         <div class="card">
+            <div class="app-header">
+                <div class="logo">Dashboard</div>
+                <div class="nav-links">
+                    <a href="customers.php">Customers</a>
+                    <a href="products.php">Products</a>
+                    <a href="installments.php">Installments</a>
+                    <a href="payments.php">Payments</a>
+                    <a href="reports/customer_report.php">Reports</a>
+                </div>
+            </div>
             <h1>Dashboard</h1>
         <p class="subtitle">Welcome, <?php echo htmlspecialchars($_SESSION['full_name']); ?>!</p>
 

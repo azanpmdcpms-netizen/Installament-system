@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $message = '';
+$search = trim($_GET['search'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete_id'])) {
@@ -24,24 +25,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (!is_numeric($amount) || (float)$amount <= 0) {
             $message = 'Please enter a valid amount.';
         } else {
-            $stmt = $pdo->prepare('INSERT INTO payments (installment_id, amount, payment_date, status) VALUES (?, ?, ?, ?)');
-            $stmt->execute([$installmentId, $amount, $paymentDate, $status]);
-
             $remainingStmt = $pdo->prepare('SELECT remaining_amount FROM installments WHERE id = ?');
             $remainingStmt->execute([$installmentId]);
             $remainingRow = $remainingStmt->fetch();
-            if ($remainingRow) {
+
+            if (!$remainingRow) {
+                $message = 'Selected installment could not be found.';
+            } elseif ((float)$amount > (float)$remainingRow['remaining_amount']) {
+                $message = 'Amount cannot exceed the remaining installment balance.';
+            } else {
+                $stmt = $pdo->prepare('INSERT INTO payments (installment_id, amount, payment_date, status) VALUES (?, ?, ?, ?)');
+                $stmt->execute([$installmentId, $amount, $paymentDate, $status]);
+
                 $newRemaining = max(0, (float)$remainingRow['remaining_amount'] - (float)$amount);
                 $updateStmt = $pdo->prepare('UPDATE installments SET remaining_amount = ? WHERE id = ?');
                 $updateStmt->execute([$newRemaining, $installmentId]);
-            }
 
-            $message = 'Payment recorded successfully.';
+                $message = 'Payment recorded successfully.';
+            }
         }
     }
 }
 
-$stmt = $pdo->query('SELECT p.*, i.id AS installment_id, c.name AS customer_name, pr.name AS product_name FROM payments p LEFT JOIN installments i ON i.id = p.installment_id LEFT JOIN customers c ON c.id = i.customer_id LEFT JOIN products pr ON pr.id = i.product_id ORDER BY p.payment_date DESC, p.id DESC');
+$whereClause = '';
+$params = [];
+if ($search !== '') {
+    $whereClause = 'WHERE c.name LIKE ? OR pr.name LIKE ? OR p.payment_date LIKE ? OR p.status LIKE ?';
+    $term = '%' . $search . '%';
+    $params = [$term, $term, $term, $term];
+}
+
+$stmt = $pdo->prepare('SELECT p.*, i.id AS installment_id, c.name AS customer_name, pr.name AS product_name FROM payments p LEFT JOIN installments i ON i.id = p.installment_id LEFT JOIN customers c ON c.id = i.customer_id LEFT JOIN products pr ON pr.id = i.product_id ' . $whereClause . ' ORDER BY p.payment_date DESC, p.id DESC');
+$stmt->execute($params);
 $payments = $stmt->fetchAll();
 
 $installments = $pdo->query('SELECT i.id, c.name AS customer_name, pr.name AS product_name FROM installments i LEFT JOIN customers c ON c.id = i.customer_id LEFT JOIN products pr ON pr.id = i.product_id ORDER BY i.id DESC')->fetchAll();
@@ -57,7 +72,16 @@ $installments = $pdo->query('SELECT i.id, c.name AS customer_name, pr.name AS pr
 <body>
     <div class="page-shell">
         <div class="card card-wide">
-            <h1>Payment Module</h1>
+        <div class="app-header">
+            <div class="logo">Payment Module</div>
+            <div class="nav-links">
+                <a href="dashboard.php">Dashboard</a>
+                <a href="customers.php">Customers</a>
+                <a href="products.php">Products</a>
+                <a href="installments.php">Installments</a>
+            </div>
+        </div>
+        <h1>Payment Module</h1>
         <p class="subtitle">Add payments and review payment history.</p>
 
         <?php if ($message !== ''): ?>
@@ -95,6 +119,14 @@ $installments = $pdo->query('SELECT i.id, c.name AS customer_name, pr.name AS pr
                 <button type="submit">Add Payment</button>
             </form>
         </div>
+
+        <form method="get" class="search-bar">
+            <input type="search" name="search" class="search-input" placeholder="Search payments..." value="<?php echo htmlspecialchars($search); ?>">
+            <button type="submit" class="button-link search-button">Search</button>
+            <?php if ($search !== ''): ?>
+                <a href="payments.php" class="button-link secondary">Clear</a>
+            <?php endif; ?>
+        </form>
 
         <h2 style="margin-top: 30px;">Payment History</h2>
         <?php if (empty($payments)): ?>

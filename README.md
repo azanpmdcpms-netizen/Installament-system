@@ -1,26 +1,42 @@
 # Installment Management System
 
-A simple PHP login-based installment management system for initial setup.
+A polished PHP installment management system with login, customer/product management, installment and payment tracking, search, and reporting.
 
-## Features
-- Login page
-- Dashboard page
-- Logout
-- MySQL database auto-creation on first run
+## Key Features
+- Secure login using username or email
+- Dashboard with quick stat cards
+- Customer CRUD module with search
+- Product CRUD module with search
+- Installment creation and management
+- Payment entry with remaining balance validation
+- Searchable payment history
+- Reports for customers, payments, and due installments
+- Auto-create MySQL database and schema on first run
+- Responsive, modern UI with consistent navigation
 
 ## Demo Login
-- Username: admin
-- Password: admin123
+- Username: `admin`
+- Email: `admin@example.com`
+- Password: `admin123`
 
-## XAMPP Setup
-1. Install XAMPP and start Apache and MySQL.
+## How to Run
+1. Install XAMPP and start Apache/MySQL.
 2. Place this project folder inside `C:\xampp\htdocs\`.
 3. Open `http://localhost/Installment%20Management%20System/` in your browser.
-4. The first visit will create the database and required table automatically.
+4. The first visit will auto-create the database and tables.
+5. Login with the demo credentials.
+
+## Search
+- Use the search fields on the Customers, Products, Installments, and Payments pages.
+- Clear search results with the `Clear` button.
 
 ## Database
 The application uses:
-- Host: 127.0.0.1
-- Database: installment_db
-- User: root
+- Host: `127.0.0.1`
+- Database: `installment_db`
+- User: `root`
 - Password: empty
+
+## Notes
+- Payments automatically update the installment remaining amount.
+- The admin user is created automatically if it does not already exist.

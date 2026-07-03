@@ -1,4 +1,4 @@
- <?php
+<?php
 require_once __DIR__ . '/config/database.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -8,6 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $message = '';
 $mode = 'list';
+$search = trim($_GET['search'] ?? '');
 $product = ['id' => '', 'name' => '', 'price' => '', 'description' => ''];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -53,7 +54,16 @@ if (isset($_GET['view_id'])) {
     $mode = 'view';
 }
 
-$stmt = $pdo->query('SELECT * FROM products ORDER BY id DESC');
+$whereClause = '';
+$params = [];
+if ($search !== '') {
+    $whereClause = 'WHERE name LIKE ? OR description LIKE ?';
+    $term = '%' . $search . '%';
+    $params = [$term, $term];
+}
+
+$stmt = $pdo->prepare('SELECT * FROM products ' . $whereClause . ' ORDER BY id DESC');
+$stmt->execute($params);
 $products = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -67,7 +77,16 @@ $products = $stmt->fetchAll();
 <body>
     <div class="page-shell">
         <div class="card card-wide">
-            <h1>Product Module</h1>
+        <div class="app-header">
+            <div class="logo">Product Module</div>
+            <div class="nav-links">
+                <a href="dashboard.php">Dashboard</a>
+                <a href="customers.php">Customers</a>
+                <a href="installments.php">Installments</a>
+                <a href="payments.php">Payments</a>
+            </div>
+        </div>
+        <h1>Product Module</h1>
         <p class="subtitle">Add, view, edit, and delete products.</p>
 
         <?php if ($message !== ''): ?>
@@ -97,6 +116,14 @@ $products = $stmt->fetchAll();
                 <?php endif; ?>
             </form>
         </div>
+
+        <form method="get" class="search-bar">
+            <input type="search" name="search" class="search-input" placeholder="Search products..." value="<?php echo htmlspecialchars($search); ?>">
+            <button type="submit" class="button-link search-button">Search</button>
+            <?php if ($search !== ''): ?>
+                <a href="products.php" class="button-link secondary">Clear</a>
+            <?php endif; ?>
+        </form>
 
         <h2 style="margin-top: 30px;">Product List</h2>
         <?php if (empty($products)): ?>
